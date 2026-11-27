@@ -1,35 +1,17 @@
-#!/usr/bin/env bash
-set -e
+#!/usr/bin/env php
+<?php
 
-echo "Hello gh-wizard!"
+declare(strict_types=1);
 
-# Snippets to help get started:
+require __DIR__.'/vendor/autoload.php';
 
-# Determine if an executable is in the PATH
-# if ! type -p ruby >/dev/null; then
-#   echo "Ruby not found on the system" >&2
-#   exit 1
-# fi
+use Dunlavystudio\GhWizard\Commands\WizardCommand;
+use Symfony\Component\Console\Application;
 
-# Pass arguments through to another command
-# gh issue list "$@" -R cli/cli
+$application = new Application('GitHub Wizard', '0.1.0-dev');
 
-# Using the gh api command to retrieve and format information
-# QUERY='
-#   query($endCursor: String) {
-#     viewer {
-#       repositories(first: 100, after: $endCursor) {
-#         nodes {
-#           nameWithOwner
-#           stargazerCount
-#         }
-#       }
-#     }
-#   }
-# '
-# TEMPLATE='
-#   {{- range $repo := .data.viewer.repositories.nodes -}}
-#     {{- printf "name: %s - stargazers: %v\n" $repo.nameWithOwner $repo.stargazerCount -}}
-#   {{- end -}}
-# '
-# exec gh api graphql -f query="${QUERY}" --paginate --template="${TEMPLATE}"
+$application->addCommand(new WizardCommand());
+
+$application->setDefaultCommand('wizard', true);
+
+exit($application->run());
