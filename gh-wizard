@@ -8,7 +8,10 @@ require __DIR__.'/vendor/autoload.php';
 use Dunlavystudio\GhWizard\Commands\WizardCommand;
 use Symfony\Component\Console\Application;
 
-$application = new Application('GitHub Wizard', '0.1.0-dev');
+$application = new Application(
+        'GitHub Wizard',
+        '0.1.0'
+);
 
 $application->addCommand(new WizardCommand());
 
