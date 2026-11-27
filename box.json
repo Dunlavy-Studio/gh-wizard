@@ -1,0 +1,4 @@
+{
+  "main": "gh-wizard",
+  "output": "build/gh-wizard.phar"
+}
