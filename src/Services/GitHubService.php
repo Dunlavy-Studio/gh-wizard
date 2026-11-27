@@ -4,11 +4,27 @@ declare(strict_types=1);
 
 namespace Dunlavystudio\GhWizard\Services;
 
+use Closure;
 use InvalidArgumentException;
 use Symfony\Component\Process\Process;
 
 final class GitHubService
 {
+    private readonly Closure $runner;
+
+    public function __construct(?Closure $runner = null)
+    {
+        $this->runner = $runner ?? static function (
+            array $command
+        ): string {
+            $process = new Process($command);
+
+            $process->mustRun();
+
+            return $process->getOutput();
+        };
+    }
+
     public function getAuthenticatedUser(): string
     {
         return $this->execute([
@@ -73,19 +89,15 @@ final class GitHubService
 
         return $this->execute($arguments);
     }
+
     /**
      * @param list<string> $arguments
      */
     private function execute(array $arguments): string
     {
-        $process = new Process([
-            'gh',
-            ...$arguments,
-        ]);
-
-        $process->mustRun();
-
-        return trim($process->getOutput());
+        return trim(
+            ($this->runner)(['gh', ...$arguments])
+        );
     }
 
     public function openRepository(

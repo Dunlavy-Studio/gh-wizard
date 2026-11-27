@@ -8,6 +8,10 @@ use Symfony\Component\Process\Process;
 
 final class GitService
 {
+    public function __construct(
+        private readonly ?string $workingDirectory = null,
+    ) {}
+
     public function getRepositoryRoot(): string
     {
         return $this->execute([
@@ -18,8 +22,7 @@ final class GitService
 
     public function hasCommits(): bool
     {
-        $process = new Process([
-            'git',
+        $process = $this->process([
             'rev-parse',
             '--verify',
             'HEAD',
@@ -55,12 +58,20 @@ final class GitService
     /**
      * @param list<string> $arguments
      */
+    private function process(array $arguments): Process
+    {
+        return new Process(
+            ['git', ...$arguments],
+            $this->workingDirectory,
+        );
+    }
+
+    /**
+     * @param list<string> $arguments
+     */
     private function execute(array $arguments): string
     {
-        $process = new Process([
-            'git',
-            ...$arguments,
-        ]);
+        $process = $this->process($arguments);
 
         $process->mustRun();
 
