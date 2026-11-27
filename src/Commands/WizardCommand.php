@@ -66,6 +66,7 @@ final class WizardCommand extends Command
                 label: 'Repositories',
                 options: [
                     'create' => 'Create a repository',
+                    'publish' => 'Publish an existing local project',
                     'back' => 'Back',
                 ],
                 default: 'create',
@@ -75,9 +76,10 @@ final class WizardCommand extends Command
                 return Navigation::Back;
             }
 
-            if ($action === 'create') {
-                $navigation = (new CreateRepository($github))
-                    ->run();
+            if (in_array($action, ['create', 'publish'], true)) {
+                $navigation = (new CreateRepository($github))->run(
+                    publishLocal: $action === 'publish',
+                );
 
                 if ($navigation === Navigation::Exit) {
                     return Navigation::Exit;

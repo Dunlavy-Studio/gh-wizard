@@ -6,6 +6,8 @@ namespace Dunlavystudio\GhWizard\Workflows\Repositories;
 
 use Dunlavystudio\GhWizard\Services\GitHubService;
 use Dunlavystudio\GhWizard\Workflows\Navigation;
+use Dunlavystudio\GhWizard\Services\GitService;
+
 use Symfony\Component\Process\Exception\ProcessFailedException;
 
 use function Laravel\Prompts\confirm;
@@ -21,8 +23,54 @@ final class CreateRepository
         private readonly GitHubService $github,
     ) {}
 
-    public function run(): Navigation
+    public function run(
+        bool $publishLocal = false,
+    ): Navigation
     {
+
+        $source = null;
+        $branch = null;
+
+        if ($publishLocal) {
+            $git = new GitService();
+
+            try {
+                $source = $git->getRepositoryRoot();
+
+                if (!$git->hasCommits()) {
+                    error('The repository has no commits.');
+
+                    return Navigation::Back;
+                }
+
+                if ($git->hasRemotes()) {
+                    error('This repository already has a remote.');
+
+                    return Navigation::Back;
+                }
+
+                if ($git->hasUncommittedChanges()) {
+                    error('Commit your local changes before publishing.');
+
+                    return Navigation::Back;
+                }
+
+                $branch = $git->getCurrentBranch();
+
+                info('Local Git repository detected.');
+                info("Location: {$source}");
+                info("Branch: {$branch}");
+
+            } catch (ProcessFailedException $exception) {
+                error(
+                    trim($exception->getProcess()->getErrorOutput())
+                        ?: $exception->getMessage()
+                );
+
+                return Navigation::Back;
+            }
+        }
+
         try {
             info('Retrieving GitHub account...');
 
@@ -48,6 +96,7 @@ final class CreateRepository
             $name = text(
                 label: 'Repository name',
                 placeholder: 'my-new-project',
+                default: $source !== null ? basename($source) : '',
                 required: true,
                 validate: fn (string $value) =>
                 preg_match('/^[a-zA-Z0-9._-]{1,100}$/D', $value)
@@ -70,15 +119,32 @@ final class CreateRepository
                 default: 'private',
             );
 
+            $rows = [
+                ['Owner', $owner],
+                ['Name', $name],
+                ['Description', $description ?: 'None'],
+                ['Visibility', ucfirst($visibility)],
+            ];
+
+            if ($source !== null) {
+                $rows[] = ['Local source', $source];
+                $rows[] = ['Branch', $branch];
+                $rows[] = ['Remote', 'origin'];
+                $rows[] = ['Push commits', 'Yes'];
+            }
+
             table(
                 headers: ['Property', 'Value'],
-                rows: [
-                    ['Owner', $owner],
-                    ['Name', $name],
-                    ['Description', $description ?: 'None'],
-                    ['Visibility', ucfirst($visibility)],
-                ],
+                rows: $rows,
             );
+
+            if ($publishLocal) {
+                info(
+                    'Your committed code and associated Git history '
+                    .'will be uploaded to GitHub. Check for secrets '
+                    .'before continuing.'
+                );
+            }
 
             if (!confirm(
                 label: 'Create this repository?',
@@ -96,6 +162,7 @@ final class CreateRepository
                 name: $name,
                 visibility: $visibility,
                 description: $description,
+                source: $source,
             );
 
             info('Repository created successfully!');
