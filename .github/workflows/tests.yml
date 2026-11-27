@@ -46,5 +46,11 @@ jobs:
       - name: Install dependencies
         run: composer install --prefer-dist --no-interaction --no-progress
 
+      - name: Check code formatting
+        run: composer lint
+
+      - name: Run static analysis
+        run: composer analyse
+
       - name: Run tests
         run: vendor/bin/pest --ci --configuration=phpunit.xml

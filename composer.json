@@ -22,11 +22,24 @@
         "symfony/process": "^8.1"
     },
     "require-dev": {
-        "pestphp/pest": "^5.3"
+        "pestphp/pest": "^5.3",
+        "laravel/pint": "^1.32",
+        "phpstan/phpstan": "^2.3"
     },
     "config": {
         "allow-plugins": {
             "pestphp/pest-plugin": true
         }
+    },
+    "scripts": {
+        "test": "pest",
+        "lint": "pint --test",
+        "format": "pint",
+        "analyse": "phpstan analyse",
+        "check": [
+            "@lint",
+            "@analyse",
+            "@test"
+        ]
     }
 }

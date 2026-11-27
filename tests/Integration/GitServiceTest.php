@@ -3,13 +3,13 @@
 declare(strict_types=1);
 
 use Dunlavystudio\GhWizard\Services\GitService;
-use Symfony\Component\Process\Process;
 use Symfony\Component\Process\Exception\ProcessFailedException;
+use Symfony\Component\Process\Process;
 
 beforeEach(function () {
     $this->directory = sys_get_temp_dir()
-        . DIRECTORY_SEPARATOR
-        . 'gh-wizard-' . bin2hex(random_bytes(8));
+        .DIRECTORY_SEPARATOR
+        .'gh-wizard-'.bin2hex(random_bytes(8));
 
     mkdir($this->directory, 0700);
 
@@ -26,7 +26,7 @@ afterEach(function () {
     );
 
     foreach ($files as $file) {
-        if ($file->isDir() && !$file->isLink()) {
+        if ($file->isDir() && ! $file->isLink()) {
             rmdir($file->getPathname());
         } else {
             unlink($file->getPathname());
@@ -66,7 +66,7 @@ function initialiseRepository(string $directory): void
 function createCommit(string $directory): void
 {
     file_put_contents(
-        $directory . '/README.md',
+        $directory.'/README.md',
         '# Test Repository',
     );
 
@@ -89,7 +89,7 @@ it('retrieves the repository root', function () {
 it('retrieves the repository root from a subdirectory', function () {
     initialiseRepository($this->directory);
 
-    $subdirectory = $this->directory . '/src';
+    $subdirectory = $this->directory.'/src';
 
     mkdir($subdirectory);
 
@@ -143,7 +143,7 @@ it('detects untracked files', function () {
     initialiseRepository($this->directory);
 
     file_put_contents(
-        $this->directory . '/new-file.txt',
+        $this->directory.'/new-file.txt',
         'Untracked content',
     );
 
@@ -156,7 +156,7 @@ it('detects modified tracked files', function () {
     createCommit($this->directory);
 
     file_put_contents(
-        $this->directory . '/README.md',
+        $this->directory.'/README.md',
         'Modified content',
     );
 
@@ -168,7 +168,7 @@ it('detects staged changes', function () {
     initialiseRepository($this->directory);
 
     file_put_contents(
-        $this->directory . '/new-file.txt',
+        $this->directory.'/new-file.txt',
         'Staged content',
     );
 

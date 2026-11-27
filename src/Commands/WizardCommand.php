@@ -28,7 +28,7 @@ final class WizardCommand extends Command
     ): int {
         intro('GitHub Wizard');
 
-        $github = new GitHubService();
+        $github = new GitHubService;
 
         while (true) {
             $action = select(

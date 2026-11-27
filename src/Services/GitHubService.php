@@ -62,8 +62,8 @@ final class GitHubService
         string $description = '',
         ?string $source = null,
     ): string {
-        if (!in_array($visibility, ['public', 'private'], true)) {
-            throw new \InvalidArgumentException(
+        if (! in_array($visibility, ['public', 'private'], true)) {
+            throw new InvalidArgumentException(
                 'Invalid repository visibility.'
             );
         }
@@ -91,7 +91,7 @@ final class GitHubService
     }
 
     /**
-     * @param list<string> $arguments
+     * @param  list<string>  $arguments
      */
     private function execute(array $arguments): string
     {
@@ -125,4 +125,3 @@ final class GitHubService
         ]);
     }
 }
-

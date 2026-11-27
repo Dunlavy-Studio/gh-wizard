@@ -41,9 +41,9 @@ final class GitService
     public function hasUncommittedChanges(): bool
     {
         return $this->execute([
-                'status',
-                '--porcelain',
-            ]) !== '';
+            'status',
+            '--porcelain',
+        ]) !== '';
     }
 
     public function getCurrentBranch(): string
@@ -56,7 +56,7 @@ final class GitService
     }
 
     /**
-     * @param list<string> $arguments
+     * @param  list<string>  $arguments
      */
     private function process(array $arguments): Process
     {
@@ -67,7 +67,7 @@ final class GitService
     }
 
     /**
-     * @param list<string> $arguments
+     * @param  list<string>  $arguments
      */
     private function execute(array $arguments): string
     {

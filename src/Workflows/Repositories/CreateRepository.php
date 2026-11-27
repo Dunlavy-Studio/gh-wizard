@@ -5,9 +5,8 @@ declare(strict_types=1);
 namespace Dunlavystudio\GhWizard\Workflows\Repositories;
 
 use Dunlavystudio\GhWizard\Services\GitHubService;
-use Dunlavystudio\GhWizard\Workflows\Navigation;
 use Dunlavystudio\GhWizard\Services\GitService;
-
+use Dunlavystudio\GhWizard\Workflows\Navigation;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 
 use function Laravel\Prompts\confirm;
@@ -25,19 +24,18 @@ final class CreateRepository
 
     public function run(
         bool $publishLocal = false,
-    ): Navigation
-    {
+    ): Navigation {
 
         $source = null;
         $branch = null;
 
         if ($publishLocal) {
-            $git = new GitService();
+            $git = new GitService;
 
             try {
                 $source = $git->getRepositoryRoot();
 
-                if (!$git->hasCommits()) {
+                if (! $git->hasCommits()) {
                     error('The repository has no commits.');
 
                     return Navigation::Back;
@@ -98,9 +96,8 @@ final class CreateRepository
                 placeholder: 'my-new-project',
                 default: $source !== null ? basename($source) : '',
                 required: true,
-                validate: fn (string $value) =>
-                preg_match('/^[a-zA-Z0-9._-]{1,100}$/D', $value)
-                && !in_array($value, ['.', '..'], true)
+                validate: fn (string $value) => preg_match('/^[a-zA-Z0-9._-]{1,100}$/D', $value)
+                && ! in_array($value, ['.', '..'], true)
                     ? null
                     : 'Enter a valid repository name.',
             );
@@ -146,7 +143,7 @@ final class CreateRepository
                 );
             }
 
-            if (!confirm(
+            if (! confirm(
                 label: 'Create this repository?',
                 default: false,
             )) {
@@ -175,6 +172,7 @@ final class CreateRepository
                 trim($exception->getProcess()->getErrorOutput())
                     ?: $exception->getMessage()
             );
+
             return Navigation::Back;
         }
     }
@@ -233,8 +231,7 @@ final class CreateRepository
             label: 'Where would you like to clone the repository?',
             default: getcwd().DIRECTORY_SEPARATOR.$name,
             required: true,
-            validate: fn (string $value) =>
-            str_starts_with($value, '/')
+            validate: fn (string $value) => str_starts_with($value, '/')
                 ? null
                 : 'Please enter an absolute directory path.',
         );
@@ -245,7 +242,7 @@ final class CreateRepository
             return;
         }
 
-        if (!confirm(
+        if (! confirm(
             label: "Clone repository to {$directory}?",
             default: false,
         )) {
