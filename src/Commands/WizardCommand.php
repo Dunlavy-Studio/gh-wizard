@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Dunlavystudio\GhWizard\Commands;
 
 use Dunlavystudio\GhWizard\Services\GitHubService;
+use Dunlavystudio\GhWizard\Workflows\Navigation;
 use Dunlavystudio\GhWizard\Workflows\Repositories\CreateRepository;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -36,22 +37,30 @@ final class WizardCommand extends Command
                     'repositories' => 'Repositories',
                     'exit' => 'Exit',
                 ],
+                default: 'repositories',
             );
 
             if ($action === 'exit') {
-                outro('Happy coding!');
-
-                return Command::SUCCESS;
+                break;
             }
 
             if ($action === 'repositories') {
-                $this->repositories($github);
+                $navigation = $this->repositories($github);
+
+                if ($navigation === Navigation::Exit) {
+                    break;
+                }
             }
         }
+
+        outro('Happy coding!');
+
+        return Command::SUCCESS;
     }
 
-    private function repositories(GitHubService $github): void
-    {
+    private function repositories(
+        GitHubService $github,
+    ): Navigation {
         while (true) {
             $action = select(
                 label: 'Repositories',
@@ -59,14 +68,20 @@ final class WizardCommand extends Command
                     'create' => 'Create a repository',
                     'back' => 'Back',
                 ],
+                default: 'create',
             );
 
             if ($action === 'back') {
-                return;
+                return Navigation::Back;
             }
 
             if ($action === 'create') {
-                (new CreateRepository($github))->run();
+                $navigation = (new CreateRepository($github))
+                    ->run();
+
+                if ($navigation === Navigation::Exit) {
+                    return Navigation::Exit;
+                }
             }
         }
     }

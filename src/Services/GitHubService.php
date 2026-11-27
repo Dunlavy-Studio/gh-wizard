@@ -80,4 +80,30 @@ final class GitHubService
 
         return trim($process->getOutput());
     }
+
+    public function openRepository(
+        string $owner,
+        string $name,
+    ): void {
+        $this->execute([
+            'repo',
+            'view',
+            "{$owner}/{$name}",
+            '--web',
+        ]);
+    }
+
+    public function cloneRepository(
+        string $owner,
+        string $name,
+        string $directory,
+    ): void {
+        $this->execute([
+            'repo',
+            'clone',
+            "{$owner}/{$name}",
+            $directory,
+        ]);
+    }
 }
+
