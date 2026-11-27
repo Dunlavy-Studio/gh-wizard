@@ -11,9 +11,8 @@ use function Laravel\Prompts\confirm;
 use function Laravel\Prompts\error;
 use function Laravel\Prompts\info;
 use function Laravel\Prompts\select;
-use function Laravel\Prompts\spin;
-use function Laravel\Prompts\text;
 use function Laravel\Prompts\table;
+use function Laravel\Prompts\text;
 
 final class CreateRepository
 {
@@ -24,15 +23,13 @@ final class CreateRepository
     public function run(): void
     {
         try {
-            $user = spin(
-                callback: fn () => $this->github->getAuthenticatedUser(),
-                message: 'Retrieving GitHub account...',
-            );
+            info('Retrieving GitHub account...');
 
-            $organisations = spin(
-                callback: fn () => $this->github->getOrganisations(),
-                message: 'Retrieving organisations...',
-            );
+            $user = $this->github->getAuthenticatedUser();
+
+            info('Retrieving organisations...');
+
+            $organisations = $this->github->getOrganisations();
 
             $owners = [
                 $user => "{$user} (Personal account)",
@@ -91,14 +88,13 @@ final class CreateRepository
                 return;
             }
 
-            $result = spin(
-                callback: fn () => $this->github->createRepository(
-                    owner: $owner,
-                    name: $name,
-                    visibility: $visibility,
-                    description: $description,
-                ),
-                message: 'Creating repository...',
+            info('Creating repository...');
+
+            $result = $this->github->createRepository(
+                owner: $owner,
+                name: $name,
+                visibility: $visibility,
+                description: $description,
             );
 
             info('Repository created successfully!');
