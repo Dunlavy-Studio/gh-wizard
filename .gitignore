@@ -2,3 +2,5 @@
 /.idea/
 /.phpunit.cache/
 .env
+/build/
+/dist/
